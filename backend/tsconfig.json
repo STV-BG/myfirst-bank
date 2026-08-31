@@ -7,9 +7,12 @@
         "removeComments": true,
          "strict": true,
         "skipDefaultLibCheck": true,
-        "forceConsistentCasingInFileNames": true
-
+        "forceConsistentCasingInFileNames": true,
+           "paths": {
+      "@/*": ["./src/*"]
+    }
     },
+
     "include": [
         "src/**/*"
     ],
