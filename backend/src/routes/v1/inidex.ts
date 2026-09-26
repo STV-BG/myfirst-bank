@@ -6,6 +6,10 @@ import { timeStamp } from "node:console";
 import { version } from "node:os";
 
 const router = Router();
+
+
+//Rute
+import authRoutes from '@/routes/v1/auth'
 //Koren ruta
 
  router.get("/", (req, res) => {
@@ -18,5 +22,5 @@ const router = Router();
         timeStamp:new Date().toISOString(),
       });
     });
-
+router.use('/auth', authRoutes);
      export default router;

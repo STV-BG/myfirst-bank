@@ -6,7 +6,8 @@ import helmet from "helmet";
 
 import config from "@/config";
 import limiter from "@/lib/express_rate_limit";
-import {connectToDatabase, disconnectFromDatabase}from '@/lib/mongoose';
+import { connectToDatabase, disconnectFromDatabase } from "@/lib/mongoose";
+import { logger } from "@/lib/winston";
 
 //Ruter /ruter
 import v1Routes from "@/routes/v1/inidex";
@@ -67,14 +68,14 @@ app.use(limiter);
 
 (async () => {
   try {
-        await connectToDatabase();
+    await connectToDatabase();
 
     app.use("/api/v1", v1Routes);
     app.listen(config.PORT, () => {
-      console.log(`Server radi na portu: http://localhost:${config.PORT}`);
+      logger.info(`Server radi na portu: http://localhost:${config.PORT}`);
     });
   } catch (err) {
-    console.log("Neuspesno pokretanje server", err);
+    logger.error("Neuspesno pokretanje server", err);
     if (config.NODE_ENV === "production") {
       process.exit(1);
     }
@@ -85,19 +86,18 @@ app.use(limiter);
 //Log uspesne poruke da je diskonetovanje uspesno / Ukoliko se desi greska prilikom diskonekt. sa servera - prikazujemo u konzoli (log)
 //Exit process. sa status kodom 0 - predstavlaj uspesan status, u nasem sluvaju shutdown
 
-const handleServerShutdown = async()=>{
-  try{
+const handleServerShutdown = async () => {
+  try {
     await disconnectFromDatabase();
-    console.log('Server se gasi');
-  process.exit(0);
-  }catch(err){
-    console.log('Greska prilikom gasenja servera',err)
+    console.warn("Server se gasi");
+    process.exit(0);
+  } catch (err) {
+    console.error("Greska prilikom gasenja servera", err);
   }
-  
 };
 //Signali / SIGTERM - stopiranje procesa(kill komanda)
 //SIGINT - kada korisnik pravi interrupt procesa (ctrl+c)
 //Signali kada pristignu i kada se izvrsi konstanta za gasenje servera, oni osiguravaju da je bilo pravilno gasenje
 
-process.on('SIGTERM', handleServerShutdown);
-process.on('SIGINT', handleServerShutdown);
+process.on("SIGTERM", handleServerShutdown);
+process.on("SIGINT", handleServerShutdown);

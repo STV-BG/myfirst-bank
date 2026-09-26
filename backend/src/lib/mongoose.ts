@@ -1,7 +1,10 @@
 import mongoose from "mongoose";
 import config from "@/config";
+
+import { logger } from "@/lib/winston";
 //tipovi
 import type { ConnectOptions } from "mongoose";
+import { log } from "node:console";
  //opcije klijenta
 
 const clientOptions: ConnectOptions = {
@@ -26,14 +29,14 @@ export const connectToDatabase = async (): Promise<void> => {
   }
   try {
     await mongoose.connect(config.MONGO_URI, clientOptions);
-    console.log("Konekcija prema bazi je uspesna.", {
+    logger.info("Konekcija prema bazi je uspesna.", {
       uri: config.MONGO_URI,
       options: clientOptions,
     });
   } catch (err) {
   
     
-    console.log("Greska prilikom kacenja na bazu", err);
+    logger.error("Greska prilikom kacenja na bazu", err);
   }
 };
 
@@ -44,7 +47,7 @@ export const disconnectFromDatabase = async (): Promise<void> => {
   
   try {
     await mongoose.disconnect();
-    console.log("Diskonect prema bazi je uspesna.", {
+    logger.info("Diskonect prema bazi je uspesna.", {
       uri: config.MONGO_URI,
       options: clientOptions,
     });
@@ -52,6 +55,6 @@ export const disconnectFromDatabase = async (): Promise<void> => {
     if (err instanceof Error) {
       throw new Error(err.message);
     }
-    console.log("Greska prilikom diskonektovanja sa bazu", err);
+    logger.error("Greska prilikom diskonektovanja sa bazu", err);
   }
 };
